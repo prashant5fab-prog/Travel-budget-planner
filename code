@@ -1,0 +1,120 @@
+#include <iostream>
+#include <iomanip>
+#include <map>
+#include <algorithm>
+using namespace std;
+
+
+string toUpperCase(string str)
+{
+    transform(str.begin(), str.end(), str.begin(), ::toupper);
+    return str;
+}
+
+
+map<string, double> rates = {
+    {"USD", 1.0},
+    {"INR", 83.0},
+    {"EUR", 0.92},
+    {"GBP", 0.78},
+    {"JPY", 150.0},
+    {"AUD", 1.50},
+    {"CAD", 1.35}
+};
+
+
+map<string, string> countryCurrency = {
+    {"JAPAN", "JPY"},
+    {"INDIA", "INR"},
+    {"USA", "USD"},
+    {"UK", "GBP"},
+    {"GERMANY", "EUR"},
+    {"AUSTRALIA", "AUD"},
+    {"CANADA", "CAD"}
+};
+
+
+double calculateTotal(int days, double food, double hotel, double transport, double other)
+{
+    return (food + hotel + transport + other) * days;
+}
+
+
+double convertCurrency(double amount, string base, string target)
+{
+    if(rates.find(base) == rates.end() || rates.find(target) == rates.end())
+        return -1;
+
+    return amount * (rates[target] / rates[base]);
+}
+
+int main()
+{
+    string baseCurrency, destination;
+    int days;
+    double food, hotel, transport, other;
+
+    cout << "====================================\n";
+    cout << "        TRAVEL BUDGET PLANNER       \n";
+    cout << "====================================\n";
+
+    cout << "Enter Your Currency (USD, INR, EUR, GBP, JPY, AUD, CAD): ";
+    cin >> baseCurrency;
+    baseCurrency = toUpperCase(baseCurrency);
+
+    cout << "Enter Destination Country (Japan, USA, UK, India, Germany, Australia, Canada): ";
+    cin >> destination;
+    destination = toUpperCase(destination);
+
+    if(countryCurrency.find(destination) == countryCurrency.end())
+    {
+        cout << "Destination not supported!\n";
+        cin.get();   // pause before exit
+        return 0;
+    }
+
+    string targetCurrency = countryCurrency[destination];
+
+    cout << "\nEnter Number of Days: ";
+    cin >> days;
+
+    cout << "\n--- Enter Daily Expenses (in " << baseCurrency << ") ---\n";
+    cout << "Food Expense per Day: ";
+    cin >> food;
+
+    cout << "Hotel Expense per Day: ";
+    cin >> hotel;
+
+    cout << "Transport Expense per Day: ";
+    cin >> transport;
+
+    cout << "Other Expense per Day: ";
+    cin >> other;
+
+    double totalBase = calculateTotal(days, food, hotel, transport, other);
+
+    cout << fixed << setprecision(2);
+    cout << "\nTotal Budget in " << baseCurrency << ": " << totalBase << endl;
+
+    double convertedAmount = convertCurrency(totalBase, baseCurrency, targetCurrency);
+
+    if(convertedAmount == -1)
+    {
+        cout << "Currency conversion error!\n";
+    }
+    else
+    {
+        cout << "Total Budget in " << destination
+             << " Currency (" << targetCurrency << "): "
+             << convertedAmount << endl;
+    }
+
+    cout << "\nThank you for using Travel Budget Planner!\n";
+
+   
+    cout << "\nPress Enter to exit...";
+    cin.ignore();
+    cin.get();
+
+    return 0;
+}
